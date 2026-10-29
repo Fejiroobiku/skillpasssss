@@ -58,7 +58,7 @@ The pilot covers three trades (electrical installation, auto mechanics and tailo
 | Node.js | 22 or later | Tested on 22.22 |
 | npm | 10 or later | Comes with Node 22 |
 | PostgreSQL | 14 or later | Tested on 16 |
-| Browser | Recent Chrome, Edge, Opera, Firefox or Safari | Mobile-first; tested from 360 px wide |
+| Browser | Recent Chromium-based browser (Chrome, Edge, Opera, Opera GX) | Mobile-first; tested from 360 px wide. Firefox and Safari not tested yet |
 | Operating system | Windows (with WSL), macOS or Linux | Developed on Windows 11 + WSL Ubuntu |
 
 Main frameworks and libraries:
