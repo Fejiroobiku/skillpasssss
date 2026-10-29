@@ -1,6 +1,6 @@
 # SkillPass
 
-An assessor-verified digital skills passport for informal artisans in Nigeria, with safe job payments through escrow.
+A digital skills passport for informal artisans in Nigeria. Assessors verify the skills, and job payments go through escrow.
 
 | | |
 |---|---|
@@ -14,11 +14,11 @@ An assessor-verified digital skills passport for informal artisans in Nigeria, w
 
 About 93% of employment in Nigeria is informal, and most tradespeople learn through workshop apprenticeships. They finish with real skills but no record that an employer outside their area can check, and employers have no quick way to tell real skill from a bought certificate.
 
-SkillPass lets an **assessor** (an approved, experienced tradesperson) record a skill they **watched** an **artisan** perform, backed by a live photo or video. The artisan confirms it, and anyone can verify it in under a minute through a QR code or link, with no login. Integrity safeguards keep assessors honest, and verified skills feed job referrals.
+On SkillPass, an assessor (an approved, experienced tradesperson) records a skill they watched an artisan perform, backed by a live photo or video. The artisan confirms it, and anyone can verify it in under a minute through a QR code or link, without logging in. A set of integrity checks watches how assessors issue credentials, and verified skills are used to refer artisans to jobs.
 
-When an employer hires through SkillPass, both sides agree the price in the app with **materials and workmanship shown separately**. The employer pays into **escrow** before work starts: materials money goes to the artisan at once, and workmanship is held until the employer confirms the job (or released automatically after 3 days). Disputes freeze the money and an administrator decides how it is shared. Both sides rate each other. Everything is governed by a plain-language [Terms of Service](src/data/terms.ts) (English and Pidgin) that everyone accepts.
+When an employer hires through SkillPass, the two sides agree the price in the app, with materials and workmanship priced separately. The employer pays into escrow before work starts. The materials money goes to the artisan straight away, and the workmanship money is held until the employer confirms the job, or released automatically after 3 days. A dispute freezes the money until an administrator decides how to share it. Employer and artisan rate each other afterwards. Everyone accepts a plain-language [Terms of Service](src/data/terms.ts) (English and Pidgin) that sets out these rules.
 
-> **Names:** the app calls the two main roles **Assessor** and **Artisan** (an artisan may have learned as an apprentice or be self-taught). In the code and database the role ids are still `trainer` and `apprentice`, so URLs such as `/trainer` and `/apprentice` are unchanged.
+> A note on names: the app calls the two main roles Assessor and Artisan, since an artisan may have learned as an apprentice or taught themselves. In the code and database the role ids are still `trainer` and `apprentice`, so URLs such as `/trainer` and `/apprentice` have not changed.
 
 The pilot covers three trades (electrical installation, auto mechanics and tailoring) in Lagos State.
 
@@ -29,27 +29,27 @@ The pilot covers three trades (electrical installation, auto mechanics and tailo
 | **Assessor** | Assess a skill against its rubric; record live video evidence showing a one-time code; issue a signed credential; see their trust score; propose new skills |
 | **Artisan** | Confirm or reject each credential; share a passport link and QR code (switch it off or make a new link at any time); send a quote for referred jobs; accept job terms; take before/after photos; get paid; raise a dispute; rate employers; report an assessor privately |
 | **Employer** | Verify a credential; post a job (who buys materials, materials and workmanship budgets); compare quotes; offer a job with clear terms; pay into escrow; confirm the work to release payment, or raise a dispute; rate the artisan |
-| **Administrator** | Approve assessors and employers; review flags, held credentials, random audits, confidential reports and **job disputes** (split held money 0–100%); revoke; manage skills; set the review period; read pilot metrics; check the tamper-evident audit log |
+| **Administrator** | Approve assessors and employers; review flags, held credentials, random audits, confidential reports and job disputes (split held money from 0 to 100%); revoke; manage skills; set the review period; read pilot metrics; check the tamper-evident audit log |
 | **Public** | Verify any credential by ID, link or QR code, with no account |
 
 ### Integrity safeguards
 
-- **Evidence before credential:** a video must show a one-time code from the server; files are SHA-256 hashed and a file can never back two credentials.
-- **Artisan confirmation:** a credential is only valid once the artisan confirms it.
-- **Escrow:** job money is held by SkillPass until the employer confirms the work; disputes freeze it until an administrator decides (Terms of Service, sections 6 and 8).
-- **Co-signing:** advanced skills and new assessors on probation need a second assessor's signature.
-- **Risk rules and trust score:** fast issuing, passing everyone, clustered days, poor employer ratings and open reports raise an assessor's risk; trust combines audit agreement, ratings and flags.
-- **Random audits:** about 10% of credentials are re-checked by an independent assessor.
-- **Signatures:** every credential carries an HMAC-SHA256 server signature; the public page shows whether it still matches.
-- **Tamper-evident audit log:** entries are sealed in an HMAC hash chain, so any edit, deletion or reordering is detected.
-- **Private evidence:** files are only served through signed links that expire after 30 minutes.
-- **Privacy (Nigeria Data Protection Act 2023):** 18+ only, phone verification, no exact GPS or phone numbers in public, and withdrawing consent removes a person's data and evidence.
+- Evidence before credential: a video must show a one-time code from the server; files are SHA-256 hashed and a file can never back two credentials.
+- Artisan confirmation: a credential only becomes valid once the artisan confirms it.
+- Escrow: SkillPass holds job money until the employer confirms the work; disputes freeze it until an administrator decides (Terms of Service, sections 6 and 8).
+- Co-signing: advanced skills and new assessors on probation need a second assessor's signature.
+- Risk rules and trust score: an assessor's risk goes up if they issue too fast, pass everyone, cluster credentials on a few days, get poor employer ratings or have open reports. The trust score combines audit agreement, ratings and flags.
+- Random audits: about 10% of credentials are re-checked by an independent assessor.
+- Signatures: every credential carries an HMAC-SHA256 server signature; the public page shows whether it still matches.
+- Tamper-evident audit log: entries are sealed in an HMAC hash chain, so an edited, deleted or reordered entry shows up when the chain is checked.
+- Private evidence: files are only served through signed links that expire after 30 minutes.
+- Privacy (Nigeria Data Protection Act 2023): 18+ only, phone verification, no exact GPS or phone numbers in public, and withdrawing consent removes a person's data and evidence.
 
 ### Built for Lagos conditions
 
-- **English and Nigerian Pidgin** on the artisan, sign-in, Terms and public pages (`src/i18n`).
-- **Weak signal:** failed uploads are kept on the phone (IndexedDB) and sent when the connection returns; video is capped at about 3 MB per 30 s; a service worker lets the app open without signal.
-- **Low-end phones:** signed-in pages load on demand. On a throttled low-end Android profile (6× CPU, 3G) the sign-in page is ready in 1.96 s and a credential check in 2.54 s (see the report).
+- English and Nigerian Pidgin on the artisan, sign-in, Terms and public pages (`src/i18n`).
+- Weak signal: failed uploads stay on the phone (IndexedDB) and are sent when the connection returns. Video is capped at about 3 MB per 30 s, and a service worker lets the app open with no signal.
+- Low-end phones: signed-in pages load on demand. On a throttled low-end Android profile (6× CPU, 3G) the sign-in page is ready in 1.96 s and a credential check in 2.54 s (see the report).
 
 ## Technical requirements
 
@@ -77,8 +77,8 @@ Main frameworks and libraries:
 ### 1. Get the code
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/Fejiroobiku/skillpasssss.git
+cd skillpasssss
 ```
 
 ### 2. Database
@@ -103,7 +103,7 @@ npm run dev               # API on http://localhost:4000
 
 Generate the two secrets with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Upgrading an older database instead of creating a new one: `npm run db:migrate`. To start again with fresh demo data (development only): `npm run db:reset`.
 
-**Payments.** By default `PAYMENT_PROVIDER=simulated`: employers pay on a test checkout page and no money moves. To use Paystack in test mode, set `PAYMENT_PROVIDER=paystack` and `PAYSTACK_SECRET_KEY=sk_test_…`, and point the Paystack webhook at `<PUBLIC_URL>/api/payments/paystack/webhook`. Live keys are refused unless `PAYSTACK_ALLOW_LIVE=true`.
+Payments: by default `PAYMENT_PROVIDER=simulated`: employers pay on a test checkout page and no money moves. To use Paystack in test mode, set `PAYMENT_PROVIDER=paystack` and `PAYSTACK_SECRET_KEY=sk_test_…`, and point the Paystack webhook at `<PUBLIC_URL>/api/payments/paystack/webhook`. Live keys are refused unless `PAYSTACK_ALLOW_LIVE=true`.
 
 ### 4. Frontend
 
@@ -205,7 +205,7 @@ Text lives in `src/i18n/en.ts` (English, the source) and `src/i18n/pcm.ts` (Pidg
 
 ## Third-party licences
 
-SkillPass reuses only open-source libraries with permissive licences. No external datasets or AI models are used.
+SkillPass uses only open-source libraries with permissive licences, and no external datasets or AI models.
 
 | Library | Used for | Licence |
 |---|---|---|
