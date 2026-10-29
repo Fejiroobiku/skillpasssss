@@ -4,7 +4,7 @@ A digital skills passport for informal artisans in Nigeria. Assessors verify the
 
 | | |
 |---|---|
-| **Walkthrough video** | https://youtu.be/U8pesWQt8CI |
+| **Walkthrough video** | https://www.youtube.com/watch?v=t6LdxuTkw1M |
 | **Code repository** | https://github.com/Fejiroobiku/skillpasssss |
 | **Technical report (PDF)** | [docs/SkillPass_Technical_Report.pdf](docs/SkillPass_Technical_Report.pdf) |
 | **Live demo** | https://skillpasssss.vercel.app (demo accounts below; the free API server sleeps when idle, so the first sign-in can take up to a minute) |
