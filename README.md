@@ -4,10 +4,10 @@ An assessor-verified digital skills passport for informal artisans in Nigeria, w
 
 | | |
 |---|---|
-| **Walkthrough video** | [paste your video link here] |
+| **Walkthrough video** | https://youtu.be/U8pesWQt8CI |
 | **Code repository** | https://github.com/Fejiroobiku/skillpasssss |
 | **Technical report (PDF)** | [docs/SkillPass_Technical_Report.pdf](docs/SkillPass_Technical_Report.pdf) |
-| **Live demo** | [paste the deployed link here, if deployed] |
+| **Live demo** | https://skillpasssss.vercel.app (demo accounts below; the free API server sleeps when idle, so the first sign-in can take up to a minute) |
 | **Author** | Fejiro Obiku, BSc Software Engineering, African Leadership University. Supervisor: Tunde Isiaq Gbadamosi |
 
 ## Project overview
@@ -198,9 +198,9 @@ Text lives in `src/i18n/en.ts` (English, the source) and `src/i18n/pcm.ts` (Pidg
 
 | Part | Service | Notes |
 |---|---|---|
-| Frontend | Netlify or Vercel | `npm run build`, auto-deploys from GitHub |
-| Backend API | Render (Frankfurt region) | Environment variables set in the dashboard |
-| Database | Render or Supabase PostgreSQL (Frankfurt) | Personal data stays in the EU region named in the ethics application |
+| Frontend | Vercel (live: https://skillpasssss.vercel.app) | `npm run build`, auto-deploys from GitHub; `VITE_API_URL` and `VITE_DEMO_MODE` set as Config variables |
+| Backend API | Render, Frankfurt (live: https://skillpass-api-3i7w.onrender.com) | Root directory `backend`; environment variables set in the dashboard; `CORS_ORIGINS` and `APP_URL` point at the Vercel site |
+| Database | Neon PostgreSQL (demo data in London, eu-west-2) | Move to an EU region (Frankfurt) before the real pilot, as named in the ethics application |
 | Evidence files | Supabase Storage (Frankfurt) | Add a subclass of `EvidenceStore` in `backend/src/lib/storage.js` |
 
 ## Third-party licences
