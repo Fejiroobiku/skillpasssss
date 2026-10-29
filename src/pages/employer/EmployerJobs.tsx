@@ -26,7 +26,7 @@ export function EmployerJobs() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const myTrade = employers.find((e) => e.id === user?.id)?.trade ?? 'electrical';
-  const [trade, setTrade] = useState<TradeId>(myTrade);
+  const trade: TradeId = myTrade;
   const [skillIds, setSkillIds] = useState<string[]>([]);
   const [location, setLocation] = useState<Place | null>(null);
   const [materialsBy, setMaterialsBy] = useState<MaterialsBy>('employer');
@@ -130,10 +130,12 @@ export function EmployerJobs() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="job-trade" className="block text-sm font-semibold text-ink">Trade</label>
-              <select id="job-trade" value={trade} onChange={(e) => {setTrade(e.target.value as TradeId);setSkillIds([]);}} className="mt-1.5 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm">
-                {trades.filter((t) => t.id === myTrade).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-              </select>
+              <p id="job-trade-label" className="block text-sm font-semibold text-ink">Trade</p>
+              {/* Employers post jobs only in their own trade (the API enforces this), so there is nothing to choose here. */}
+              <p aria-labelledby="job-trade-label" className="mt-1.5 rounded-sm border border-line bg-canvas px-3 py-2.5 text-sm text-ink">
+                {trades.find((t) => t.id === myTrade)?.name ?? 'Your trade'}
+              </p>
+              <p className="mt-1 text-xs text-ink-subtle">Jobs are posted in your registered trade.</p>
             </div>
             <div className="col-span-2">
               <LocationPicker id="job-place" label="Job location" onChange={setLocation} inputClassName="w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-ink-subtle focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30" />
