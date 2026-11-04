@@ -32,14 +32,22 @@ export function EmployerJobs() {
   const [materialsBy, setMaterialsBy] = useState<MaterialsBy>('employer');
   const [materialsBudget, setMaterialsBudget] = useState('');
   const [workmanshipBudget, setWorkmanshipBudget] = useState('');
+  // Stops a second click (common while the server wakes up) from posting the same job twice.
+  const [posting, setPosting] = useState(false);
 
   const create = async () => {
-    if (!location) return;
-    const job = await postJob({
-      employerId: me.id, title: title.trim(), trade, skillIds, location, pay: '', materialsBy,
-      materialsBudget: materialsBy === 'artisan' && materialsBudget ? Number(materialsBudget) : null,
-      workmanshipBudget: workmanshipBudget ? Number(workmanshipBudget) : null
-    });
+    if (!location || posting) return;
+    setPosting(true);
+    let job: Awaited<ReturnType<typeof postJob>>;
+    try {
+      job = await postJob({
+        employerId: me.id, title: title.trim(), trade, skillIds, location, pay: '', materialsBy,
+        materialsBudget: materialsBy === 'artisan' && materialsBudget ? Number(materialsBudget) : null,
+        workmanshipBudget: workmanshipBudget ? Number(workmanshipBudget) : null
+      });
+    } finally {
+      setPosting(false);
+    }
     if (!job) return;
     setSelectedId(job.id);
     setOpen(false);
@@ -178,7 +186,7 @@ export function EmployerJobs() {
           <p className="text-xs text-ink-subtle">Artisans reply with their own quote. You agree the final amounts before paying.</p>
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={() => setOpen(false)} className="rounded-xl px-4 py-2.5 text-sm font-medium text-ink hover:bg-canvas">Cancel</button>
-            <button type="button" disabled={!title.trim() || skillIds.length === 0 || !location} onClick={create} className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-night transition-colors duration-150 hover:bg-brand-700 disabled:opacity-40">Post & find matches</button>
+            <button type="button" disabled={posting || !title.trim() || skillIds.length === 0 || !location} onClick={create} className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-night transition-colors duration-150 hover:bg-brand-700 disabled:opacity-40">{posting ? 'Posting…' : 'Post & find matches'}</button>
           </div>
         </div>
       </Modal>
