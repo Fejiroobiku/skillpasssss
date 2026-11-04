@@ -27,7 +27,7 @@ const choice = (name, allowed, fallback) => {
   return value;
 };
 const smsProvider = choice('SMS_PROVIDER', ['console', 'termii'], 'console');
-const emailProvider = choice('EMAIL_PROVIDER', ['console', 'resend'], 'console');
+const emailProvider = choice('EMAIL_PROVIDER', ['console', 'resend', 'brevo'], 'console');
 const paymentProvider = choice('PAYMENT_PROVIDER', ['simulated', 'paystack'], 'simulated');
 
 function paystackKey() {
@@ -80,5 +80,6 @@ export const config = {
   } : null,
   emailProvider,
   resendApiKey: emailProvider === 'resend' ? required('RESEND_API_KEY') : null,
-  emailFrom: emailProvider === 'resend' ? required('EMAIL_FROM') : null,
+  brevoApiKey: emailProvider === 'brevo' ? required('BREVO_API_KEY') : null,
+  emailFrom: emailProvider === 'console' ? null : required('EMAIL_FROM'),
 };

@@ -13,7 +13,7 @@ process.env.SIGNING_KEY = 'test-signing-key-test-signing-key-test-signing-key';
 const { SignedUrlSigner } = await import('../src/lib/signedUrls.js');
 const { JobMatcher, distanceKm } = await import('../src/lib/matching.js');
 const { TrustScoreCalculator, RiskAssessor, RiskRule, FastIssuingRule, ClusteredDayRule } = await import('../src/lib/scoring.js');
-const { MessageChannel, ConsoleChannel, TermiiSmsChannel, DeliveryError, createSmsChannel, createEmailChannel } = await import('../src/lib/messaging.js');
+const { MessageChannel, ConsoleChannel, TermiiSmsChannel, BrevoEmailChannel, ResendEmailChannel, parseSender, DeliveryError, createSmsChannel, createEmailChannel } = await import('../src/lib/messaging.js');
 const { EvidenceStore } = await import('../src/lib/storage.js');
 
 /* ------------------------------------------------------------------ signed links */
@@ -238,6 +238,40 @@ describe('MessageChannel family', () => {
     assert.ok(createSmsChannel({ smsProvider: 'console' }) instanceof ConsoleChannel);
     assert.ok(createSmsChannel({ smsProvider: 'termii', termii: { apiKey: 'k', senderId: 's', baseUrl: 'u', channel: 'dnd' } }) instanceof TermiiSmsChannel);
     assert.ok(createEmailChannel({ emailProvider: 'console' }) instanceof ConsoleChannel);
+    assert.ok(createEmailChannel({ emailProvider: 'resend', resendApiKey: 'k', emailFrom: 'SkillPass <a@b.ng>' }) instanceof ResendEmailChannel);
+    assert.ok(createEmailChannel({ emailProvider: 'brevo', brevoApiKey: 'k', emailFrom: 'SkillPass <a@b.ng>' }) instanceof BrevoEmailChannel);
+  });
+
+  it('reads the sender name and address from EMAIL_FROM', () => {
+    assert.deepEqual(parseSender('SkillPass <fejiro@gmail.com>'), { name: 'SkillPass', email: 'fejiro@gmail.com' });
+    assert.deepEqual(parseSender('"Skill Pass" <x@y.ng>'), { name: 'Skill Pass', email: 'x@y.ng' });
+    assert.deepEqual(parseSender('x@y.ng'), { name: 'SkillPass', email: 'x@y.ng' });
+    assert.throws(() => parseSender('not an email'), RangeError);
+  });
+
+  it('Brevo channel sends the sender, recipient and text with the API key, and turns refusals into DeliveryError', async () => {
+    const realFetch = globalThis.fetch;
+    const calls = [];
+    try {
+      globalThis.fetch = async (url, init) => { calls.push({ url, headers: init.headers, body: JSON.parse(init.body) }); return { ok: true, json: async () => ({ messageId: 'm1' }) }; };
+      const ch = new BrevoEmailChannel({ apiKey: 'xkeysib-test', from: 'SkillPass <fejiro@gmail.com>' });
+      await ch.send({ to: 'artisan@example.com', subject: 'Reset your password', text: 'Open this link' });
+      assert.equal(calls[0].url, 'https://api.brevo.com/v3/smtp/email');
+      assert.equal(calls[0].headers['api-key'], 'xkeysib-test');
+      assert.deepEqual(calls[0].body, { sender: { name: 'SkillPass', email: 'fejiro@gmail.com' }, to: [{ email: 'artisan@example.com' }], subject: 'Reset your password', textContent: 'Open this link' });
+      assert.equal(ch.isConsole, false);
+
+      globalThis.fetch = async () => ({ ok: false, status: 401, text: async () => 'Key not found' });
+      const quiet = console.error;
+      console.error = () => {};
+      try {
+        await assert.rejects(ch.send({ to: 'artisan@example.com', subject: 's', text: 't' }), DeliveryError);
+      } finally {
+        console.error = quiet;
+      }
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 });
 

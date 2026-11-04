@@ -56,4 +56,10 @@ describe('startup secrets', () => {
     assert.equal(load({ PAYMENT_PROVIDER: 'paystack', PAYSTACK_SECRET_KEY: 'sk_live_abc', PAYSTACK_ALLOW_LIVE: 'true' }).status, 0);
     assert.notEqual(load({ PAYMENT_PROVIDER: 'paystack' }).status, 0);
   });
+
+  it('needs a key and a sender address for Brevo email', () => {
+    assert.equal(load({ EMAIL_PROVIDER: 'brevo', BREVO_API_KEY: 'xkeysib-abc', EMAIL_FROM: 'SkillPass <a@b.ng>' }).status, 0);
+    assert.notEqual(load({ EMAIL_PROVIDER: 'brevo', EMAIL_FROM: 'SkillPass <a@b.ng>' }).status, 0);
+    assert.notEqual(load({ EMAIL_PROVIDER: 'brevo', BREVO_API_KEY: 'xkeysib-abc' }).status, 0);
+  });
 });

@@ -7,7 +7,8 @@ import { config } from '../config.js';
  *   SMS_PROVIDER=termii    send through Termii: TERMII_API_KEY, TERMII_SENDER_ID, TERMII_BASE_URL, TERMII_CHANNEL
  *
  *   EMAIL_PROVIDER=console (default) print the email in the server terminal; nothing is sent
- *   EMAIL_PROVIDER=resend  send through Resend: RESEND_API_KEY, EMAIL_FROM
+ *   EMAIL_PROVIDER=resend  send through Resend: RESEND_API_KEY, EMAIL_FROM (needs a verified domain to reach everyone)
+ *   EMAIL_PROVIDER=brevo   send through Brevo: BREVO_API_KEY, EMAIL_FROM (the sender address must be verified in Brevo)
  *
  * Design: every channel extends MessageChannel and implements deliver(). Callers only ever call send(),
  * so adding a provider (for example Africa's Talking) means adding one subclass and one line in the factory.
@@ -106,13 +107,38 @@ export class ResendEmailChannel extends HttpChannel {
   }
 }
 
+/** Splits "SkillPass <no-reply@x.ng>" into a name and an address; a bare address is accepted too. */
+export function parseSender(from) {
+  const m = String(from ?? '').trim().match(/^(?:"?([^"<]*?)"?\s*)?<([^<>\s]+@[^<>\s]+)>$/);
+  if (m) return { name: m[1]?.trim() || 'SkillPass', email: m[2] };
+  if (/^[^<>\s]+@[^<>\s]+$/.test(String(from ?? '').trim())) return { name: 'SkillPass', email: String(from).trim() };
+  throw new RangeError('EMAIL_FROM must look like "SkillPass <name@example.com>".');
+}
+
+/** Brevo's transactional email API. Its free plan sends from a single verified sender address to anyone. */
+export class BrevoEmailChannel extends HttpChannel {
+  constructor({ apiKey, from }) {
+    super('Brevo');
+    this.apiKey = apiKey;
+    this.sender = parseSender(from);
+  }
+
+  async deliver({ to, subject, text }) {
+    await this.postJson('https://api.brevo.com/v3/smtp/email',
+      { sender: this.sender, to: [{ email: to }], subject, textContent: text },
+      { 'api-key': this.apiKey, accept: 'application/json' });
+  }
+}
+
 /** Factory: picks the channel named in the configuration. */
 export function createSmsChannel(cfg = config) {
   return cfg.smsProvider === 'termii' ? new TermiiSmsChannel(cfg.termii) : new ConsoleChannel('sms');
 }
 
 export function createEmailChannel(cfg = config) {
-  return cfg.emailProvider === 'resend' ? new ResendEmailChannel({ apiKey: cfg.resendApiKey, from: cfg.emailFrom }) : new ConsoleChannel('email');
+  if (cfg.emailProvider === 'resend') return new ResendEmailChannel({ apiKey: cfg.resendApiKey, from: cfg.emailFrom });
+  if (cfg.emailProvider === 'brevo') return new BrevoEmailChannel({ apiKey: cfg.brevoApiKey, from: cfg.emailFrom });
+  return new ConsoleChannel('email');
 }
 
 let smsChannel;
