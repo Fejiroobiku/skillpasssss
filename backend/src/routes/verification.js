@@ -113,7 +113,7 @@ router.post('/phone/verify', authenticate, async (req, res) => {
 // Email
 // ---------------------------------------------------------------------------
 
-/** Email a link that confirms the address. Not required to use SkillPass, but needed for password reset. */
+/** Email a link that confirms the address. Not required to use SkillPass. */
 router.post('/email/send', authenticate, async (req, res) => {
   const me = await accountOf(pool, req.user.id);
   if (me.email_verified_at) return res.json({ alreadyVerified: true });
@@ -154,13 +154,14 @@ router.post('/email/verify', async (req, res) => {
 
 /**
  * Always answers the same way, so nobody can use it to find out which emails have accounts.
- * A reset link is only sent to a confirmed email address.
+ * The link goes to the email on the account. Opening it proves the person can read that inbox,
+ * so a successful reset also counts as confirming the email.
  */
 router.post('/password/forgot', async (req, res) => {
   const { email } = z.object({ email: z.string().trim().toLowerCase().email('Enter a valid email address.') }).parse(req.body);
-  const answer = { message: 'If that email belongs to a SkillPass account with a confirmed email address, a reset link is on its way.' };
+  const answer = { message: 'If that email belongs to a SkillPass account, a reset link is on its way.' };
   const me = (await query(`SELECT id, name, email, email_verified_at FROM users WHERE lower(email) = $1 AND status = 'active'`, [email])).rows[0];
-  if (!me || !me.email_verified_at) return res.json(answer);
+  if (!me) return res.json(answer);
 
   const token = randomBytes(24).toString('hex');
   try {
@@ -186,15 +187,15 @@ router.post('/password/reset', async (req, res) => {
   const hash = await bcrypt.hash(password, config.bcryptRounds);
   const ok = await tx(async (db) => {
     const v = (await db.query(
-      `SELECT v.* FROM contact_verifications v JOIN users u ON u.id = v.user_id
+      `SELECT v.*, u.email FROM contact_verifications v JOIN users u ON u.id = v.user_id
         WHERE v.secret_hash = $1 AND v.purpose = 'password_reset' AND v.used_at IS NULL AND v.expires_at > now() AND u.status = 'active'
         FOR UPDATE OF v`,
       [sha256(token)],
     )).rows[0];
-    if (!v) return false;
+    if (!v || v.target !== v.email) return false;
     await db.query('UPDATE contact_verifications SET used_at = now() WHERE user_id = $1 AND purpose = $2 AND used_at IS NULL', [v.user_id, 'password_reset']);
     // password_changed_at ends every session that was signed in before the reset.
-    await db.query('UPDATE users SET password_hash = $2, password_changed_at = now() WHERE id = $1', [v.user_id, hash]);
+    await db.query('UPDATE users SET password_hash = $2, password_changed_at = now(), email_verified_at = COALESCE(email_verified_at, now()) WHERE id = $1', [v.user_id, hash]);
     await logAudit(db, { actor: { id: v.user_id, name: 'Account holder' }, action: 'account.password_reset', target: v.user_id, detail: 'Password changed with an email reset link; other sessions signed out' });
     return true;
   });

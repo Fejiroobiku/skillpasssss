@@ -109,7 +109,7 @@ describe('email verification and password reset', () => {
     assert.equal((await api('POST', '/api/auth/email/verify', { body: { token } })).status, 400); // used already
   });
 
-  it('only sends reset links to confirmed emails, and gives the same answer either way', async () => {
+  it('gives the same answer for unknown emails, and sends a link to new accounts that never confirmed', async () => {
     const unknown = await api('POST', '/api/auth/password/forgot', { body: { email: 'nobody@example.com' } });
     const { body } = await join();
     const unconfirmed = await api('POST', '/api/auth/password/forgot', { body: { email: body.user.email } });
@@ -117,7 +117,13 @@ describe('email verification and password reset', () => {
     assert.equal(unconfirmed.status, 200);
     assert.equal(unknown.body.message, unconfirmed.body.message);
     assert.equal(unknown.body.devLink, undefined);
-    assert.equal(unconfirmed.body.devLink, undefined);
+    assert.ok(unconfirmed.body.devLink, 'a new account still gets a reset link');
+
+    // Using the link proves the inbox is theirs, so the email counts as confirmed afterwards.
+    const resetToken = new URL(unconfirmed.body.devLink).searchParams.get('token');
+    assert.equal((await api('POST', '/api/auth/password/reset', { body: { token: resetToken, password: 'a-brand-new-password' } })).status, 200);
+    const fresh = await api('POST', '/api/auth/login', { body: { email: body.user.email, password: 'a-brand-new-password' } });
+    assert.equal((await api('GET', '/api/auth/me', { token: fresh.body.token })).body.user.account.emailVerified, true);
   });
 
   it('resets the password with the link and signs out every earlier session', async () => {

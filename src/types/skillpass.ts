@@ -88,7 +88,7 @@ export interface Account {
   dob: string;
   /** Confirmed by SMS code. Needed to confirm skills, co-sign and rate. */
   phoneVerified?: boolean;
-  /** Confirmed by email link. Needed for password reset. */
+  /** Confirmed by email link, or by resetting the password from an email link. */
   emailVerified?: boolean;
   /** The Terms of Service version this person accepted, and the version in force now. */
   termsVersion?: string | null;
