@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testsuite name="Terms of Service" time="1.511485" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="has a current version, and registration requires accepting it" time="0.022819" classname="test"/>
+		<testcase name="records acceptance of the current version only" time="0.013896" classname="test"/>
+	</testsuite>
+	<testsuite name="job prices and quotes" time="0.121121" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="splits a job into materials and workmanship, and refuses a materials budget when the employer buys them" time="0.048047" classname="test"/>
+		<testcase name="takes the artisan's quote when they say they are interested" time="0.072736" classname="test"/>
+	</testsuite>
+	<testsuite name="job agreement and escrow: the happy path" time="0.318101" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="needs the employer to accept the terms and to match who buys the materials" time="0.023085" classname="test"/>
+		<testcase name="cannot be paid for before the artisan accepts" time="0.004650" classname="test"/>
+		<testcase name="asks the artisan for a payout account, then records their acceptance" time="0.070118" classname="test"/>
+		<testcase name="takes the full amount into escrow, sends the materials money at once and holds the workmanship" time="0.059538" classname="test"/>
+		<testcase name="cannot be cancelled once paid" time="0.006169" classname="test"/>
+		<testcase name="needs live before and after photos before the artisan can mark the job done" time="0.106265" classname="test"/>
+		<testcase name="releases the workmanship when the employer confirms, then lets the artisan rate the employer once" time="0.047722" classname="test"/>
+	</testsuite>
+	<testsuite name="disputes and automatic release" time="0.221134" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="lets either side raise a dispute while money is held, freezing it" time="0.021538" classname="test"/>
+		<testcase name="lets the other side respond once" time="0.014929" classname="test"/>
+		<testcase name="is decided only by an administrator, who splits the held workmanship" time="0.061103" classname="test"/>
+		<testcase name="releases payment automatically when the employer does not respond in time" time="0.046645" classname="test"/>
+		<testcase name="lets either side call a job off before any money is paid" time="0.039331" classname="test"/>
+	</testsuite>
+	<testsuite name="who sees job agreements" time="0.089766" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="shows them only to the two sides and administrators" time="0.078708" classname="test"/>
+		<testcase name="only lets an administrator change the review period, within limits" time="0.010778" classname="test"/>
+	</testsuite>
+	<testsuite name="authentication" time="1.513865" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="vm">
+		<testcase name="signs in each demo role and returns the right profile" time="1.004322" classname="test"/>
+		<testcase name="gives the same error for a wrong password and an unknown email" time="0.112316" classname="test"/>
+		<testcase name="requires a token, and rejects a forged one" time="0.005786" classname="test"/>
+		<testcase name="registers an apprentice, but not an under-18 or one without consent" time="0.056094" classname="test"/>
+		<testcase name="a suspended account loses access immediately, even with a valid token" time="0.031161" classname="test"/>
+		<testcase name="only administrators can reach admin routes" time="0.026513" classname="test"/>
+	</testsuite>
+	<testsuite name="public verification" time="0.114978" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="vm">
+		<testcase name="verifies a seeded credential without a login, with a valid server signature" time="0.020714" classname="test"/>
+		<testcase name="keeps contact details, file hashes and GPS points off the public page" time="0.013180" classname="test"/>
+		<testcase name="matches the trust score the frontend computes for the same data" time="0.034681" classname="test"/>
+		<testcase name="hides who raised a flag and what they wrote" time="0.009303" classname="test"/>
+		<testcase name="shows revoked credentials with their reason, and 404s on unknown or malformed ids" time="0.015014" classname="test"/>
+		<testcase name="detects tampering: changing a signed field makes the signature invalid" time="0.021543" classname="test"/>
+	</testsuite>
+	<testsuite name="evidence" time="0.146218" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="rejects files that are not photos or videos, whatever the browser claims" time="0.022625" classname="test"/>
+		<testcase name="only marks a location as GPS when the phone says so and sends coordinates" time="0.043434" classname="test"/>
+		<testcase name="requires a server-issued, unused, unexpired code for video" time="0.028979" classname="test"/>
+		<testcase name="stores the file, hashes it on the server, and serves it back" time="0.011948" classname="test"/>
+		<testcase name="serves evidence only through signed links that have not been edited" time="0.019946" classname="test"/>
+		<testcase name="treats the same trainer re-sending an unused file as a retry, not a duplicate" time="0.014301" classname="test"/>
+		<testcase name="only trainers can upload" time="0.004329" classname="test"/>
+	</testsuite>
+	<testsuite name="issuing a credential" time="0.198872" disabled="0" errors="0" tests="6" failures="0" skipped="0" hostname="vm">
+		<testcase name="refuses apprentices, missing video, incomplete rubric, other trainers' apprentices and other trades" time="0.065307" classname="test"/>
+		<testcase name="issues a signed credential and attaches the evidence" time="0.047759" classname="test"/>
+		<testcase name="records the issue in the audit log and asks the apprentice to confirm" time="0.004758" classname="test"/>
+		<testcase name="will not reuse evidence on a second credential, or let the same skill be held twice" time="0.035362" classname="test"/>
+		<testcase name="blocks and logs an attempt to upload a file already used as evidence" time="0.016530" classname="test"/>
+		<testcase name="only the named apprentice can confirm, and confirming makes it valid" time="0.028526" classname="test"/>
+	</testsuite>
+	<testsuite name="co-signing an advanced skill" time="0.109815" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="needs an eligible co-signer" time="0.074820" classname="test"/>
+		<testcase name="becomes pending co-sign after the apprentice confirms, and only the requested person can co-sign" time="0.034750" classname="test"/>
+	</testsuite>
+	<testsuite name="daily issuing limit" time="0.202596" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="holds a credential for administrator review once the limit is reached" time="0.054144" classname="test"/>
+		<testcase name="an administrator can release a held credential, which goes back into the normal flow" time="0.015703" classname="test"/>
+		<testcase name="simultaneous issues cannot all slip under the limit" time="0.132421" classname="test"/>
+	</testsuite>
+	<testsuite name="a new trainer on probation" time="0.110508" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="vm">
+		<testcase name="registers, is approved by an administrator, and then needs a co-signer on every credential" time="0.110294" classname="test"/>
+	</testsuite>
+	<testsuite name="flags and disputes" time="0.181853" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="an employer can flag a valid credential, but a trainer cannot flag their own" time="0.017594" classname="test"/>
+		<testcase name="dismissing the flag restores the credential; upholding it revokes it" time="0.070268" classname="test"/>
+		<testcase name="a revoked skill can be assessed and issued again" time="0.055711" classname="test"/>
+		<testcase name="an apprentice can dispute a credential they did not earn" time="0.021805" classname="test"/>
+		<testcase name="the issuing trainer can revoke their own credential, but not someone else's" time="0.016025" classname="test"/>
+	</testsuite>
+	<testsuite name="risk and misconduct" time="0.093741" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="vm">
+		<testcase name="reports the risk signals the frontend computes for a trainer" time="0.006662" classname="test"/>
+		<testcase name="records an honest &amp;quot;not yet competent&amp;quot; assessment, and refuses one where every criterion was met" time="0.012723" classname="test"/>
+		<testcase name="misconduct freezes issuing and puts every credential the trainer signed under review" time="0.026094" classname="test"/>
+		<testcase name="a failed audit re-check revokes the credential" time="0.047894" classname="test"/>
+	</testsuite>
+	<testsuite name="confidential reports and the audit log" time="0.164425" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="vm">
+		<testcase name="files an apprentice report without recording who filed it, and only admins can read it" time="0.131418" classname="test"/>
+		<testcase name="the audit log is append-only, even for the database owner" time="0.007922" classname="test"/>
+		<testcase name="the audit log is hash-chained, so a change made by switching the triggers off is caught" time="0.020832" classname="test"/>
+		<testcase name="administrators can page through the log" time="0.003912" classname="test"/>
+	</testsuite>
+	<testsuite name="privacy" time="0.089864" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="withdrawing consent removes an apprentice's personal data and evidence, and withdraws their credentials" time="0.062209" classname="test"/>
+		<testcase name="never sends GPS points to employers" time="0.005149" classname="test"/>
+		<testcase name="only the browser that recorded a verification can rate it, and only once" time="0.022155" classname="test"/>
+	</testsuite>
+	<testsuite name="startup secrets" time="0.541970" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="starts with two different real secrets" time="0.043794" classname="test"/>
+		<testcase name="refuses the placeholder JWT_SECRET from .env.example" time="0.052062" classname="test"/>
+		<testcase name="refuses the placeholder SIGNING_KEY from .env.example" time="0.044768" classname="test"/>
+		<testcase name="refuses the same value for both secrets" time="0.042802" classname="test"/>
+		<testcase name="refuses a short secret" time="0.043918" classname="test"/>
+		<testcase name="accepts a Paystack test key and refuses a live key unless deliberately allowed" time="0.176322" classname="test"/>
+		<testcase name="needs a key and a sender address for Brevo email" time="0.136689" classname="test"/>
+	</testsuite>
+	<testsuite name="bootstrap: what each role is allowed to see" time="1.082665" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="needs a sign-in" time="0.047132" classname="test"/>
+		<testcase name="gives administrators everything, including trust details and risk for every trainer" time="0.259425" classname="test"/>
+		<testcase name="shows a trainer their own people and credentials, and hides other people's contact details" time="0.167781" classname="test"/>
+		<testcase name="redacts the audit timeline and other trainers' trust details for non-admins" time="0.024753" classname="test"/>
+		<testcase name="shows an apprentice only their own record, and their trainer's score without details" time="0.150650" classname="test"/>
+		<testcase name="shows an employer verified apprentices in their trade, without contact details, and only their own jobs" time="0.157220" classname="test"/>
+		<testcase name="lists proposed skills only for trainers and administrators" time="0.036874" classname="test"/>
+	</testsuite>
+	<testsuite name="public passport" time="0.539482" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="vm">
+		<testcase name="shows an apprentice's skills, trainer and employer ratings without contact details" time="0.010679" classname="test"/>
+		<testcase name="cannot be found by guessing an account ID" time="0.006593" classname="test"/>
+		<testcase name="lets the apprentice switch the public link off and replace it" time="0.163681" classname="test"/>
+		<testcase name="shows a passport by account only to the apprentice's own trainer and administrators" time="0.358094" classname="test"/>
+	</testsuite>
+	<testsuite name="employer ratings" time="0.237800" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="are tied to a real accepted job, given once, and only for the apprentice's own credentials" time="0.217477" classname="test"/>
+		<testcase name="are refused for an employer an administrator has not verified" time="0.019986" classname="test"/>
+	</testsuite>
+	<testsuite name="jobs and referrals" time="0.238256" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="lets an employer post a job in their own trade and tells them how many apprentices match" time="0.050000" classname="test"/>
+		<testcase name="only sends referrals to apprentices with verified skills for the job, once, from a verified employer" time="0.033712" classname="test"/>
+		<testcase name="lets the apprentice accept once, then the employer mark them contacted" time="0.154209" classname="test"/>
+	</testsuite>
+	<testsuite name="skills and trades" time="0.176169" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="lets an approved trainer propose a skill, and an administrator approve or decline it" time="0.148858" classname="test"/>
+		<testcase name="lets an administrator add skills and trades, once each" time="0.026931" classname="test"/>
+	</testsuite>
+	<testsuite name="usability survey" time="0.073249" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="vm">
+		<testcase name="scores the System Usability Scale on the server, once per person" time="0.073045" classname="test"/>
+	</testsuite>
+	<testsuite name="admin extras" time="0.059840" disabled="0" errors="0" tests="2" failures="0" skipped="0" hostname="vm">
+		<testcase name="assigns an assessor to an audit sample" time="0.043209" classname="test"/>
+		<testcase name="queues every valid credential of a risky trainer for re-checking, without duplicating pending ones" time="0.016379" classname="test"/>
+	</testsuite>
+	<testsuite name="demo evidence" time="0.019390" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="vm">
+		<testcase name="is refused unless the server has demo mode switched on" time="0.019180" classname="test"/>
+	</testsuite>
+	<testsuite name="SMS provider (Termii) failures" time="0.860490" disabled="0" errors="0" tests="4" failures="0" skipped="0" hostname="vm">
+		<testcase name="answers 502 with a plain message when Termii cannot be reached, and leaves the phone unverified" time="0.013920" classname="test"/>
+		<testcase name="answers 502 without revealing Termii's own error text when Termii refuses" time="0.011282" classname="test"/>
+		<testcase name="sends the code once Termii is back, to the number without &amp;quot;+&amp;quot;" time="0.007589" classname="test"/>
+		<testcase name="keeps queued job alerts when Termii is down, then sends them on the next run" time="0.006808" classname="test"/>
+	</testsuite>
+	<testsuite name="Email provider (Brevo) failures" time="0.048544" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="gives the same answer for a real and an unknown email when Brevo is down, so accounts cannot be discovered" time="0.015040" classname="test"/>
+		<testcase name="gives the same answer when Brevo refuses the key" time="0.009870" classname="test"/>
+		<testcase name="sends the reset link once Brevo is back, and the link works" time="0.023321" classname="test"/>
+	</testsuite>
+	<testsuite name="Payment provider (Paystack) failures" time="0.153044" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="answers 502 when Paystack cannot be reached at checkout, and records no money" time="0.009163" classname="test"/>
+		<testcase name="passes Paystack's reason on when it refuses, and still records no money" time="0.011019" classname="test"/>
+		<testcase name="does not mark a job paid when Paystack says the payment was abandoned" time="0.010420" classname="test"/>
+		<testcase name="answers 502 if Paystack goes down while checking a payment, and records nothing" time="0.005210" classname="test"/>
+		<testcase name="keeps the deposit and marks the materials payout failed when transfers are refused, and tells the administrators" time="0.025836" classname="test"/>
+		<testcase name="records the deposit only once when the same confirmation arrives again" time="0.010038" classname="test"/>
+		<testcase name="refuses a webhook with a missing or wrong signature" time="0.004499" classname="test"/>
+	</testsuite>
+	<testsuite name="SignedUrlSigner: expiring evidence links" time="0.006155" disabled="0" errors="0" tests="9" failures="0" skipped="0" hostname="vm">
+		<testcase name="accepts a link it signed" time="0.001196" classname="test"/>
+		<testcase name="rejects the same signature on a different file" time="0.000463" classname="test"/>
+		<testcase name="rejects a link whose expiry was pushed later" time="0.000349" classname="test"/>
+		<testcase name="reports expired links once the time has passed" time="0.000208" classname="test"/>
+		<testcase name="rejects missing or malformed parameters" time="0.001689" classname="test"/>
+		<testcase name="does not accept links signed with another secret" time="0.000233" classname="test"/>
+		<testcase name="reuses the same link within a minute so browsers can cache it" time="0.000135" classname="test"/>
+		<testcase name="refuses a missing secret or non-positive lifetime" time="0.000468" classname="test"/>
+		<testcase name="EvidenceStore is abstract" time="0.000097" classname="test"/>
+	</testsuite>
+	<testsuite name="JobMatcher: ranking apprentices for a job" time="0.002107" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="computes great-circle distance (Ajah to Agungi is about 9 km)" time="0.000392" classname="test"/>
+		<testcase name="ranks by skills first, then distance, and leaves out people with no matching skill" time="0.001115" classname="test"/>
+		<testcase name="gives 100 for every skill at the same spot" time="0.000183" classname="test"/>
+		<testcase name="caps the distance score at zero beyond maxKm" time="0.000117" classname="test"/>
+		<testcase name="rejects weights that do not add up to 1" time="0.000108" classname="test"/>
+	</testsuite>
+	<testsuite name="JobMatcher: invalid configuration is refused" time="0.014138" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="refuses a negative weight even when the two weights add up to 1 (-0.2 and 1.2 used to score 110)" time="0.000266" classname="test"/>
+		<testcase name="refuses each weight just outside 0 to 1" time="0.000166" classname="test"/>
+		<testcase name="refuses weights that are not finite numbers" time="0.000184" classname="test"/>
+		<testcase name="refuses a maxKm that is zero, negative or not a finite number" time="0.000169" classname="test"/>
+		<testcase name="accepts the boundaries 0 and 1, and weights that only add to 1 after rounding" time="0.000269" classname="test"/>
+		<testcase name="cannot be changed into an invalid state after it is built" time="0.000127" classname="test"/>
+		<testcase name="always gives a whole number from 0 to 100, for 2,000 random valid settings and apprentices" time="0.012656" classname="test"/>
+	</testsuite>
+	<testsuite name="JobMatcher: matching quality on realistic Lagos jobs" time="0.001261" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="puts a fully qualified artisan across town above a half-qualified one next door" time="0.000303" classname="test"/>
+		<testcase name="prefers the nearer artisan when two hold the same skills" time="0.000233" classname="test"/>
+		<testcase name="breaks equal scores by more skills held, then by distance, whatever order the list arrives in" time="0.000212" classname="test"/>
+		<testcase name="leaves out an artisan with no verified required skill, however close they are" time="0.000154" classname="test"/>
+		<testcase name="returns nobody for a job that lists no skills, instead of ranking everyone at 0 skill match" time="0.000107" classname="test"/>
+	</testsuite>
+	<testsuite name="TrustScoreCalculator" time="0.001130" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="gives a new trainer a neutral score of 86" time="0.000421" classname="test"/>
+		<testcase name="applies the penalty for two or more poor ratings" time="0.000208" classname="test"/>
+		<testcase name="caps the score at 10 after proven misconduct" time="0.000103" classname="test"/>
+		<testcase name="counts revoked credentials as flagged" time="0.000125" classname="test"/>
+		<testcase name="rejects weights that do not add up to 1" time="0.000103" classname="test"/>
+	</testsuite>
+	<testsuite name="RiskAssessor and its rules" time="0.018587" disabled="0" errors="0" tests="5" failures="0" skipped="0" hostname="vm">
+		<testcase name="flags credentials signed minutes apart, in any input order" time="0.000398" classname="test"/>
+		<testcase name="counts credentials per Lagos calendar day" time="0.015652" classname="test"/>
+		<testcase name="rates two or more signals as high risk" time="0.001779" classname="test"/>
+		<testcase name="runs any rule it is given (polymorphism)" time="0.000266" classname="test"/>
+		<testcase name="cannot create the abstract base rule" time="0.000201" classname="test"/>
+	</testsuite>
+	<testsuite name="MessageChannel family" time="0.004523" disabled="0" errors="0" tests="7" failures="0" skipped="0" hostname="vm">
+		<testcase name="cannot create the abstract base channel" time="0.000185" classname="test"/>
+		<testcase name="console channel prints SMS and email and says it is console-only" time="0.000443" classname="test"/>
+		<testcase name="refuses messages without a recipient or text" time="0.000535" classname="test"/>
+		<testcase name="Termii channel posts the number without &amp;quot;+&amp;quot; and turns HTTP errors into DeliveryError" time="0.001240" classname="test"/>
+		<testcase name="factories pick the channel named in the configuration" time="0.000673" classname="test"/>
+		<testcase name="reads the sender name and address from EMAIL_FROM" time="0.000307" classname="test"/>
+		<testcase name="Brevo channel sends the sender, recipient and text with the API key, and turns refusals into DeliveryError" time="0.000717" classname="test"/>
+	</testsuite>
+	<testsuite name="PaymentGateway: escrow providers" time="0.004167" disabled="0" errors="0" tests="8" failures="0" skipped="0" hostname="vm">
+		<testcase name="cannot be used without a subclass" time="0.000323" classname="test"/>
+		<testcase name="converts naira to kobo for Paystack" time="0.000108" classname="test"/>
+		<testcase name="starts a Paystack checkout in kobo with the secret key, and reads back the result" time="0.000754" classname="test"/>
+		<testcase name="pays an artisan by creating a transfer recipient once, then a transfer" time="0.000435" classname="test"/>
+		<testcase name="turns a Paystack refusal into a readable PaymentError" time="0.001176" classname="test"/>
+		<testcase name="accepts only webhooks signed with the secret key" time="0.000528" classname="test"/>
+		<testcase name="simulates payments without moving money" time="0.000373" classname="test"/>
+		<testcase name="is chosen from the config" time="0.000124" classname="test"/>
+	</testsuite>
+	<testsuite name="phone numbers at sign-up" time="0.430496" disabled="0" errors="0" tests="1" failures="0" skipped="0" hostname="vm">
+		<testcase name="accepts Nigerian numbers in any common format and allows one account per number" time="0.115595" classname="test"/>
+	</testsuite>
+	<testsuite name="phone verification" time="0.345623" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="texts a code, limits resends, counts wrong tries, then confirms the phone" time="0.091381" classname="test"/>
+		<testcase name="stops working after five wrong tries, and when it expires" time="0.072798" classname="test"/>
+		<testcase name="administrators cannot approve an employer who has not confirmed their phone" time="0.180934" classname="test"/>
+	</testsuite>
+	<testsuite name="email verification and password reset" time="1.276805" disabled="0" errors="0" tests="3" failures="0" skipped="0" hostname="vm">
+		<testcase name="confirms an email by link, once" time="0.039647" classname="test"/>
+		<testcase name="gives the same answer for unknown emails, and sends a link to new accounts that never confirmed" time="0.051459" classname="test"/>
+		<testcase name="resets the password with the link and signs out every earlier session" time="1.185123" classname="test"/>
+	</testsuite>
+	<!-- tests 166 -->
+	<!-- suites 39 -->
+	<!-- pass 166 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 13331.293653 -->
+</testsuites>

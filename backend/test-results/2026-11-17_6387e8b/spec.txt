@@ -1,0 +1,362 @@
+▶ Terms of Service
+  ✔ has a current version, and registration requires accepting it (22.81897ms)
+  ✔ records acceptance of the current version only (13.895736ms)
+✔ Terms of Service (1511.485163ms)
+▶ job prices and quotes
+  ✔ splits a job into materials and workmanship, and refuses a materials budget when the employer buys them (48.047319ms)
+  ✔ takes the artisan's quote when they say they are interested (72.736414ms)
+✔ job prices and quotes (121.120542ms)
+▶ job agreement and escrow: the happy path
+  ✔ needs the employer to accept the terms and to match who buys the materials (23.085408ms)
+  ✔ cannot be paid for before the artisan accepts (4.649796ms)
+  ✔ asks the artisan for a payout account, then records their acceptance (70.117954ms)
+  ✔ takes the full amount into escrow, sends the materials money at once and holds the workmanship (59.53778ms)
+  ✔ cannot be cancelled once paid (6.169047ms)
+  ✔ needs live before and after photos before the artisan can mark the job done (106.264984ms)
+  ✔ releases the workmanship when the employer confirms, then lets the artisan rate the employer once (47.721721ms)
+✔ job agreement and escrow: the happy path (318.10138ms)
+▶ disputes and automatic release
+  ✔ lets either side raise a dispute while money is held, freezing it (21.537715ms)
+  ✔ lets the other side respond once (14.92941ms)
+  ✔ is decided only by an administrator, who splits the held workmanship (61.102862ms)
+  ✔ releases payment automatically when the employer does not respond in time (46.644886ms)
+  ✔ lets either side call a job off before any money is paid (39.331258ms)
+✔ disputes and automatic release (221.134452ms)
+▶ who sees job agreements
+  ✔ shows them only to the two sides and administrators (78.708056ms)
+  ✔ only lets an administrator change the review period, within limits (10.778031ms)
+✔ who sees job agreements (89.766479ms)
+▶ authentication
+  ✔ signs in each demo role and returns the right profile (1004.322061ms)
+  ✔ gives the same error for a wrong password and an unknown email (112.316144ms)
+  ✔ requires a token, and rejects a forged one (5.786448ms)
+  ✔ registers an apprentice, but not an under-18 or one without consent (56.094098ms)
+  ✔ a suspended account loses access immediately, even with a valid token (31.160787ms)
+  ✔ only administrators can reach admin routes (26.512959ms)
+✔ authentication (1513.864979ms)
+▶ public verification
+  ✔ verifies a seeded credential without a login, with a valid server signature (20.71374ms)
+  ✔ keeps contact details, file hashes and GPS points off the public page (13.180117ms)
+  ✔ matches the trust score the frontend computes for the same data (34.680903ms)
+  ✔ hides who raised a flag and what they wrote (9.303444ms)
+  ✔ shows revoked credentials with their reason, and 404s on unknown or malformed ids (15.013599ms)
+  ✔ detects tampering: changing a signed field makes the signature invalid (21.54292ms)
+✔ public verification (114.977834ms)
+▶ evidence
+  ✔ rejects files that are not photos or videos, whatever the browser claims (22.625402ms)
+  ✔ only marks a location as GPS when the phone says so and sends coordinates (43.4337ms)
+  ✔ requires a server-issued, unused, unexpired code for video (28.979008ms)
+  ✔ stores the file, hashes it on the server, and serves it back (11.948294ms)
+  ✔ serves evidence only through signed links that have not been edited (19.946428ms)
+  ✔ treats the same trainer re-sending an unused file as a retry, not a duplicate (14.300816ms)
+  ✔ only trainers can upload (4.328866ms)
+✔ evidence (146.217895ms)
+▶ issuing a credential
+  ✔ refuses apprentices, missing video, incomplete rubric, other trainers' apprentices and other trades (65.306778ms)
+  ✔ issues a signed credential and attaches the evidence (47.758745ms)
+  ✔ records the issue in the audit log and asks the apprentice to confirm (4.758158ms)
+  ✔ will not reuse evidence on a second credential, or let the same skill be held twice (35.362392ms)
+  ✔ blocks and logs an attempt to upload a file already used as evidence (16.530293ms)
+  ✔ only the named apprentice can confirm, and confirming makes it valid (28.525865ms)
+✔ issuing a credential (198.871841ms)
+▶ co-signing an advanced skill
+  ✔ needs an eligible co-signer (74.820154ms)
+  ✔ becomes pending co-sign after the apprentice confirms, and only the requested person can co-sign (34.750458ms)
+✔ co-signing an advanced skill (109.815321ms)
+▶ daily issuing limit
+  ✔ holds a credential for administrator review once the limit is reached (54.143669ms)
+  ✔ an administrator can release a held credential, which goes back into the normal flow (15.702538ms)
+  ✔ simultaneous issues cannot all slip under the limit (132.421301ms)
+✔ daily issuing limit (202.595561ms)
+[sms → +2348055550000] Your SkillPass code is 587655. It expires in 10 minutes. Never share it with anyone, including your assessor.
+▶ a new trainer on probation
+  ✔ registers, is approved by an administrator, and then needs a co-signer on every credential (110.293602ms)
+✔ a new trainer on probation (110.508171ms)
+▶ flags and disputes
+  ✔ an employer can flag a valid credential, but a trainer cannot flag their own (17.594234ms)
+  ✔ dismissing the flag restores the credential; upholding it revokes it (70.267947ms)
+  ✔ a revoked skill can be assessed and issued again (55.711237ms)
+  ✔ an apprentice can dispute a credential they did not earn (21.804619ms)
+  ✔ the issuing trainer can revoke their own credential, but not someone else's (16.025041ms)
+✔ flags and disputes (181.852883ms)
+▶ risk and misconduct
+  ✔ reports the risk signals the frontend computes for a trainer (6.661641ms)
+  ✔ records an honest "not yet competent" assessment, and refuses one where every criterion was met (12.722824ms)
+  ✔ misconduct freezes issuing and puts every credential the trainer signed under review (26.094199ms)
+  ✔ a failed audit re-check revokes the credential (47.89396ms)
+✔ risk and misconduct (93.741089ms)
+▶ confidential reports and the audit log
+  ✔ files an apprentice report without recording who filed it, and only admins can read it (131.417929ms)
+  ✔ the audit log is append-only, even for the database owner (7.922117ms)
+  ✔ the audit log is hash-chained, so a change made by switching the triggers off is caught (20.831502ms)
+  ✔ administrators can page through the log (3.912175ms)
+✔ confidential reports and the audit log (164.425282ms)
+▶ privacy
+  ✔ withdrawing consent removes an apprentice's personal data and evidence, and withdraws their credentials (62.208626ms)
+  ✔ never sends GPS points to employers (5.149406ms)
+  ✔ only the browser that recorded a verification can rate it, and only once (22.15529ms)
+✔ privacy (89.864054ms)
+▶ startup secrets
+  ✔ starts with two different real secrets (43.793743ms)
+  ✔ refuses the placeholder JWT_SECRET from .env.example (52.062485ms)
+  ✔ refuses the placeholder SIGNING_KEY from .env.example (44.767653ms)
+  ✔ refuses the same value for both secrets (42.801698ms)
+  ✔ refuses a short secret (43.917521ms)
+  ✔ accepts a Paystack test key and refuses a live key unless deliberately allowed (176.321549ms)
+  ✔ needs a key and a sender address for Brevo email (136.688557ms)
+✔ startup secrets (541.970184ms)
+▶ bootstrap: what each role is allowed to see
+  ✔ needs a sign-in (47.13229ms)
+  ✔ gives administrators everything, including trust details and risk for every trainer (259.425055ms)
+  ✔ shows a trainer their own people and credentials, and hides other people's contact details (167.781204ms)
+  ✔ redacts the audit timeline and other trainers' trust details for non-admins (24.753416ms)
+  ✔ shows an apprentice only their own record, and their trainer's score without details (150.649935ms)
+  ✔ shows an employer verified apprentices in their trade, without contact details, and only their own jobs (157.21976ms)
+  ✔ lists proposed skills only for trainers and administrators (36.873756ms)
+✔ bootstrap: what each role is allowed to see (1082.665472ms)
+▶ public passport
+  ✔ shows an apprentice's skills, trainer and employer ratings without contact details (10.679195ms)
+  ✔ cannot be found by guessing an account ID (6.593481ms)
+  ✔ lets the apprentice switch the public link off and replace it (163.681326ms)
+  ✔ shows a passport by account only to the apprentice's own trainer and administrators (358.094418ms)
+✔ public passport (539.481736ms)
+▶ employer ratings
+  ✔ are tied to a real accepted job, given once, and only for the apprentice's own credentials (217.476645ms)
+  ✔ are refused for an employer an administrator has not verified (19.985742ms)
+✔ employer ratings (237.800223ms)
+▶ jobs and referrals
+  ✔ lets an employer post a job in their own trade and tells them how many apprentices match (49.999605ms)
+  ✔ only sends referrals to apprentices with verified skills for the job, once, from a verified employer (33.711912ms)
+  ✔ lets the apprentice accept once, then the employer mark them contacted (154.208551ms)
+✔ jobs and referrals (238.256311ms)
+▶ skills and trades
+  ✔ lets an approved trainer propose a skill, and an administrator approve or decline it (148.857546ms)
+  ✔ lets an administrator add skills and trades, once each (26.931461ms)
+✔ skills and trades (176.16918ms)
+▶ usability survey
+  ✔ scores the System Usability Scale on the server, once per person (73.045128ms)
+✔ usability survey (73.24885ms)
+▶ admin extras
+  ✔ assigns an assessor to an audit sample (43.208756ms)
+  ✔ queues every valid credential of a risky trainer for re-checking, without duplicating pending ones (16.379259ms)
+✔ admin extras (59.839658ms)
+▶ demo evidence
+  ✔ is refused unless the server has demo mode switched on (19.179644ms)
+✔ demo evidence (19.389516ms)
+▶ SMS provider (Termii) failures
+  ✔ answers 502 with a plain message when Termii cannot be reached, and leaves the phone unverified (13.920397ms)
+Termii refused the request (400): {"message":"Insufficient balance"}
+  ✔ answers 502 without revealing Termii's own error text when Termii refuses (11.281512ms)
+  ✔ sends the code once Termii is back, to the number without "+" (7.588658ms)
+Could not deliver notification n-provider-sms: The message service could not be reached. Please try again.
+  ✔ keeps queued job alerts when Termii is down, then sends them on the next run (6.80829ms)
+✔ SMS provider (Termii) failures (860.490131ms)
+Password reset email for user e1 was not delivered: The message service could not be reached. Please try again.
+▶ Email provider (Brevo) failures
+  ✔ gives the same answer for a real and an unknown email when Brevo is down, so accounts cannot be discovered (15.040125ms)
+Brevo refused the request (401): {"code":"unauthorized","message":"Key not found"}
+Password reset email for user e2 was not delivered: The message could not be sent. Please try again in a moment.
+  ✔ gives the same answer when Brevo refuses the key (9.87038ms)
+  ✔ sends the reset link once Brevo is back, and the link works (23.321363ms)
+✔ Email provider (Brevo) failures (48.543745ms)
+▶ Payment provider (Paystack) failures
+  ✔ answers 502 when Paystack cannot be reached at checkout, and records no money (9.162647ms)
+Paystack refused POST /transaction/initialize (400): Invalid key
+  ✔ passes Paystack's reason on when it refuses, and still records no money (11.01866ms)
+  ✔ does not mark a job paid when Paystack says the payment was abandoned (10.420033ms)
+  ✔ answers 502 if Paystack goes down while checking a payment, and records nothing (5.209573ms)
+Paystack refused POST /transferrecipient (400): You cannot initiate third party payouts as a starter business
+  ✔ keeps the deposit and marks the materials payout failed when transfers are refused, and tells the administrators (25.835934ms)
+  ✔ records the deposit only once when the same confirmation arrives again (10.03781ms)
+  ✔ refuses a webhook with a missing or wrong signature (4.498997ms)
+✔ Payment provider (Paystack) failures (153.043919ms)
+Paystack refused POST /refund (400): Bad request
+▶ SignedUrlSigner: expiring evidence links
+  ✔ accepts a link it signed (1.196457ms)
+  ✔ rejects the same signature on a different file (0.463336ms)
+  ✔ rejects a link whose expiry was pushed later (0.348707ms)
+  ✔ reports expired links once the time has passed (0.208211ms)
+  ✔ rejects missing or malformed parameters (1.688834ms)
+  ✔ does not accept links signed with another secret (0.232764ms)
+  ✔ reuses the same link within a minute so browsers can cache it (0.134909ms)
+  ✔ refuses a missing secret or non-positive lifetime (0.468361ms)
+  ✔ EvidenceStore is abstract (0.097005ms)
+✔ SignedUrlSigner: expiring evidence links (6.154885ms)
+▶ JobMatcher: ranking apprentices for a job
+  ✔ computes great-circle distance (Ajah to Agungi is about 9 km) (0.392393ms)
+  ✔ ranks by skills first, then distance, and leaves out people with no matching skill (1.114655ms)
+  ✔ gives 100 for every skill at the same spot (0.183192ms)
+  ✔ caps the distance score at zero beyond maxKm (0.116737ms)
+  ✔ rejects weights that do not add up to 1 (0.107938ms)
+✔ JobMatcher: ranking apprentices for a job (2.107092ms)
+▶ JobMatcher: invalid configuration is refused
+  ✔ refuses a negative weight even when the two weights add up to 1 (-0.2 and 1.2 used to score 110) (0.265647ms)
+  ✔ refuses each weight just outside 0 to 1 (0.166055ms)
+  ✔ refuses weights that are not finite numbers (0.18403ms)
+  ✔ refuses a maxKm that is zero, negative or not a finite number (0.168907ms)
+  ✔ accepts the boundaries 0 and 1, and weights that only add to 1 after rounding (0.269188ms)
+  ✔ cannot be changed into an invalid state after it is built (0.126869ms)
+  ✔ always gives a whole number from 0 to 100, for 2,000 random valid settings and apprentices (12.656369ms)
+✔ JobMatcher: invalid configuration is refused (14.13785ms)
+▶ JobMatcher: matching quality on realistic Lagos jobs
+  ✔ puts a fully qualified artisan across town above a half-qualified one next door (0.302963ms)
+  ✔ prefers the nearer artisan when two hold the same skills (0.23325ms)
+  ✔ breaks equal scores by more skills held, then by distance, whatever order the list arrives in (0.211949ms)
+  ✔ leaves out an artisan with no verified required skill, however close they are (0.154378ms)
+  ✔ returns nobody for a job that lists no skills, instead of ranking everyone at 0 skill match (0.106682ms)
+✔ JobMatcher: matching quality on realistic Lagos jobs (1.260883ms)
+▶ TrustScoreCalculator
+  ✔ gives a new trainer a neutral score of 86 (0.421442ms)
+  ✔ applies the penalty for two or more poor ratings (0.207603ms)
+  ✔ caps the score at 10 after proven misconduct (0.102671ms)
+  ✔ counts revoked credentials as flagged (0.124899ms)
+  ✔ rejects weights that do not add up to 1 (0.102537ms)
+✔ TrustScoreCalculator (1.130088ms)
+▶ RiskAssessor and its rules
+  ✔ flags credentials signed minutes apart, in any input order (0.3975ms)
+  ✔ counts credentials per Lagos calendar day (15.651947ms)
+  ✔ rates two or more signals as high risk (1.779118ms)
+  ✔ runs any rule it is given (polymorphism) (0.265617ms)
+  ✔ cannot create the abstract base rule (0.201005ms)
+✔ RiskAssessor and its rules (18.586532ms)
+▶ MessageChannel family
+  ✔ cannot create the abstract base channel (0.185492ms)
+  ✔ console channel prints SMS and email and says it is console-only (0.44302ms)
+  ✔ refuses messages without a recipient or text (0.534898ms)
+  ✔ Termii channel posts the number without "+" and turns HTTP errors into DeliveryError (1.2399ms)
+  ✔ factories pick the channel named in the configuration (0.67321ms)
+  ✔ reads the sender name and address from EMAIL_FROM (0.306628ms)
+  ✔ Brevo channel sends the sender, recipient and text with the API key, and turns refusals into DeliveryError (0.716842ms)
+✔ MessageChannel family (4.523416ms)
+▶ PaymentGateway: escrow providers
+  ✔ cannot be used without a subclass (0.323355ms)
+  ✔ converts naira to kobo for Paystack (0.108079ms)
+  ✔ starts a Paystack checkout in kobo with the secret key, and reads back the result (0.754332ms)
+  ✔ pays an artisan by creating a transfer recipient once, then a transfer (0.435148ms)
+  ✔ turns a Paystack refusal into a readable PaymentError (1.176482ms)
+  ✔ accepts only webhooks signed with the secret key (0.527695ms)
+  ✔ simulates payments without moving money (0.372777ms)
+  ✔ is chosen from the config (0.124118ms)
+✔ PaymentGateway: escrow providers (4.167133ms)
+▶ phone numbers at sign-up
+  ✔ accepts Nigerian numbers in any common format and allows one account per number (115.594538ms)
+✔ phone numbers at sign-up (430.495694ms)
+[sms → +2348091112005] Your SkillPass code is 700934. It expires in 10 minutes. Never share it with anyone, including your assessor.
+▶ phone verification
+  ✔ texts a code, limits resends, counts wrong tries, then confirms the phone (91.380568ms)
+[sms → +2348091112006] Your SkillPass code is 417855. It expires in 10 minutes. Never share it with anyone, including your assessor.
+[sms → +2348091112006] Your SkillPass code is 521531. It expires in 10 minutes. Never share it with anyone, including your assessor.
+  ✔ stops working after five wrong tries, and when it expires (72.797843ms)
+  ✔ administrators cannot approve an employer who has not confirmed their phone (180.934284ms)
+✔ phone verification (345.623462ms)
+[email → person7@example.com] Confirm your email for SkillPass
+Hello Test Person 7,
+
+Confirm this email address for your SkillPass account by opening this link:
+http://localhost:5173/verify-email?token=f3d073fc44e13f23034d28546b40acb10ecb02f306753b03
+
+The link works once and expires in 24 hours. If you did not ask for this, you can ignore this email.
+
+▶ email verification and password reset
+  ✔ confirms an email by link, once (39.647091ms)
+[email → person8@example.com] Reset your SkillPass password
+Hello Test Person 8,
+
+Someone asked to reset the password for your SkillPass account. To choose a new password, open:
+http://localhost:5173/reset-password?token=aa52e0c49c27054227c57a73c99f14fc3441f7d10ee6b7b1
+
+The link works once and expires in 60 minutes. If this was not you, ignore this email; your password stays the same.
+
+  ✔ gives the same answer for unknown emails, and sends a link to new accounts that never confirmed (51.458909ms)
+[email → person9@example.com] Confirm your email for SkillPass
+Hello Test Person 9,
+
+Confirm this email address for your SkillPass account by opening this link:
+http://localhost:5173/verify-email?token=ef88aa163814bbc22c3aa78e941c572e67d7a884311be8e5
+
+The link works once and expires in 24 hours. If you did not ask for this, you can ignore this email.
+
+[email → person9@example.com] Reset your SkillPass password
+Hello Test Person 9,
+
+Someone asked to reset the password for your SkillPass account. To choose a new password, open:
+http://localhost:5173/reset-password?token=e78e286ac337abe72d16796e7707d2f8fee8055178125082
+
+The link works once and expires in 60 minutes. If this was not you, ignore this email; your password stays the same.
+
+  ✔ resets the password with the link and signs out every earlier session (1185.122777ms)
+✔ email verification and password reset (1276.804661ms)
+ℹ tests 166
+ℹ suites 39
+ℹ pass 166
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13331.293653
+ℹ start of coverage report
+ℹ -------------------------------------------------------------------------------------------------------------
+ℹ file                   | line % | branch % | funcs % | uncovered lines
+ℹ -------------------------------------------------------------------------------------------------------------
+ℹ scripts                |        |          |         | 
+ℹ  db.js                 |  62.34 |    87.50 |   75.00 | 27-31 52-75
+ℹ src                    |        |          |         | 
+ℹ  app.js                |  97.59 |   100.00 |   83.33 | 43-44
+ℹ  config.js             | 100.00 |    80.00 |  100.00 | 
+ℹ  db.js                 | 100.00 |    77.78 |   80.00 | 
+ℹ  lib                   |        |          |         | 
+ℹ   audit.js             |  93.22 |    92.31 |   83.33 | 56-59
+ℹ   auditChain.js        |  97.59 |    75.00 |   77.78 | 47-48
+ℹ   credentials.js       | 100.00 |    86.76 |  100.00 | 
+ℹ   deliveries.js        |  96.97 |    60.00 |  100.00 | 23
+ℹ   errors.js            | 100.00 |   100.00 |  100.00 | 
+ℹ   escrow.js            | 100.00 |    80.65 |  100.00 | 
+ℹ   history.js           | 100.00 |   100.00 |   83.33 | 
+ℹ   ids.js               | 100.00 |   100.00 |  100.00 | 
+ℹ   integrity.js         | 100.00 |    89.36 |  100.00 | 
+ℹ   matching.js          | 100.00 |   100.00 |  100.00 | 
+ℹ   messaging.js         |  97.47 |    93.88 |   84.00 | 44-45 106-107
+ℹ   payments.js          |  92.34 |    88.89 |   68.97 | 37-38 52-53 61-62 72-73 82-83 88-89 93-94 197 209-211
+ℹ   phone.js             |  94.74 |    60.00 |  100.00 | 9
+ℹ   privacy.js           | 100.00 |   100.00 |  100.00 | 
+ℹ   rubric.js            | 100.00 |    75.00 |  100.00 | 
+ℹ   scoring.js           |  99.10 |   100.00 |   97.67 | 91-92
+ℹ   signedUrls.js        | 100.00 |   100.00 |  100.00 | 
+ℹ   signing.js           | 100.00 |    80.00 |  100.00 | 
+ℹ   storage.js           |  96.40 |    79.49 |   85.00 | 66-67 71-72
+ℹ   terms.js             | 100.00 |   100.00 |  100.00 | 
+ℹ  middleware            |        |          |         | 
+ℹ   auth.js              | 100.00 |   100.00 |  100.00 | 
+ℹ   errors.js            |  83.87 |    56.25 |   66.67 | 6-7 28-30
+ℹ  routes                |        |          |         | 
+ℹ   admin.js             |  93.83 |    79.85 |   94.64 | 77-78 85-92 286-291 318-324
+ℹ   agreements.js        |  94.75 |    77.55 |   90.91 | 52 56 177-184 195-196 237 240-246 276-277
+ℹ   attempts.js          | 100.00 |    75.00 |  100.00 | 
+ℹ   auth.js              | 100.00 |    81.25 |  100.00 | 
+ℹ   bootstrap.js         | 100.00 |    94.27 |  100.00 | 
+ℹ   credentials.js       |  98.59 |    86.41 |  100.00 | 40-42
+ℹ   evidence.js          |  98.26 |    95.12 |   83.33 | 50-51
+ℹ   feedback.js          | 100.00 |    91.67 |  100.00 | 
+ℹ   jobs.js              | 100.00 |    88.06 |  100.00 | 
+ℹ   notifications.js     |  84.00 |   100.00 |   50.00 | 16-17 21-22
+ℹ   passport.js          | 100.00 |    82.35 |  100.00 | 
+ℹ   reference.js         |  73.02 |   100.00 |   33.33 | 10-11 15-16 44-55 60
+ℹ   reports.js           | 100.00 |    91.67 |  100.00 | 
+ℹ   skills.js            | 100.00 |   100.00 |  100.00 | 
+ℹ   sus.js               | 100.00 |   100.00 |  100.00 | 
+ℹ   trainer.js           |  59.32 |   100.00 |   33.33 | 11-22 45-56
+ℹ   verification.js      |  98.60 |    90.91 |  100.00 | 174-176
+ℹ   verify.js            | 100.00 |    88.00 |  100.00 | 
+ℹ tests                  |        |          |         | 
+ℹ  agreements.test.js    | 100.00 |   100.00 |  100.00 | 
+ℹ  api.test.js           |  99.59 |    98.11 |   97.92 | 602-604
+ℹ  config.test.js        | 100.00 |   100.00 |  100.00 | 
+ℹ  helpers.js            | 100.00 |   100.00 |   77.78 | 
+ℹ  modules.test.js       | 100.00 |    96.00 |  100.00 | 
+ℹ  providers.test.js     |  98.11 |    93.55 |  100.00 | 61-65
+ℹ  units.test.js         | 100.00 |    98.45 |   98.28 | 
+ℹ  verification.test.js  | 100.00 |    88.89 |  100.00 | 
+ℹ -------------------------------------------------------------------------------------------------------------
+ℹ all files              |  97.38 |    89.53 |   94.62 | 
+ℹ -------------------------------------------------------------------------------------------------------------
+ℹ end of coverage report
