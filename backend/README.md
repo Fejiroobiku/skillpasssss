@@ -44,6 +44,7 @@ If you prefer psql, `psql -d skillpass -f database/schema.sql` and `-f database/
 | `npm run dev` | Start the API and restart on file changes |
 | `npm start` | Start the API |
 | `npm test` | Run the end-to-end tests (see Testing) |
+| `npm run test:record` | Run every test and save the run (commit, versions, results, coverage) in `test-results/` |
 | `npm run db:schema` | Create all tables in an empty database |
 | `npm run db:migrate` | Update an existing database to the latest schema (safe to run more than once) |
 | `npm run db:seed` | Load demo data, then sign every credential |
@@ -134,6 +135,18 @@ Set `TEST_DATABASE_URL` to use another database. The URL must contain `test`, ot
 The suite covers authentication, public verification and tamper detection, evidence upload and duplicate blocking,
 every issuing rule, co-signing, the daily limit (including simultaneous requests), probation, flags and disputes,
 misconduct, audit re-checks, confidential reports and the append-only audit log.
+
+`tests/providers.test.js` switches on the real Termii, Brevo and Paystack classes and replaces only the network,
+to check each provider being unreachable or refusing: plain messages for the user, no money recorded for a failed
+checkout, failed payouts marked and reported to administrators, queued SMS kept until the provider is back, and the
+same answer from "forgot password" for real and unknown emails even when email delivery fails.
+
+### Recorded runs
+
+`npm run test:record` runs the suite with coverage and saves `test-results/<date>_<commit>/` with `summary.md`,
+`spec.txt`, `junit.xml` and `environment.json` (commit, Node, OS and PostgreSQL versions). Commit the folder together
+with the code it tested, so every figure in the report points to a real run. Results from physical phones and other
+browsers are recorded by hand in `docs/evidence/device-tests.md`.
 
 ## Deploying (from the README's plan)
 

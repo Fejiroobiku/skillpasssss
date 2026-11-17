@@ -132,7 +132,8 @@ Texts and emails (verification codes, password resets) are printed in the backen
 
 ```bash
 createdb skillpass_test                   # once; the tests wipe and re-seed this database
-cd backend && npm test                    # 137 API, integration and unit tests
+cd backend && npm test                    # API, integration, provider-failure and unit tests
+cd backend && npm run test:record         # same, saved with commit and versions in backend/test-results/
 cd .. && npm test                         # 24 UI tests: the real app against the real API
 npm run typecheck && npm run lint         # type check and lint
 ```

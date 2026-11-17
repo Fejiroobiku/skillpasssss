@@ -15,7 +15,8 @@
     "db:seed": "node scripts/db.js seed",
     "db:resign": "node scripts/db.js resign",
     "db:reset": "node scripts/db.js reset",
-    "test": "node --test --test-concurrency=1 \"tests/*.test.js\""
+    "test": "node --test --test-concurrency=1 \"tests/*.test.js\"",
+    "test:record": "node scripts/record-tests.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

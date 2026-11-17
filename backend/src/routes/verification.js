@@ -7,7 +7,7 @@ import { pool, query, tx } from '../db.js';
 import { HttpError } from '../lib/errors.js';
 import { logAudit } from '../lib/audit.js';
 import { uid } from '../lib/ids.js';
-import { sendEmail, sendSms, showEmailLink, showSmsCode } from '../lib/messaging.js';
+import { DeliveryError, sendEmail, sendSms, showEmailLink, showSmsCode } from '../lib/messaging.js';
 import { maskEmail, maskPhone } from '../lib/phone.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -175,7 +175,16 @@ router.post('/password/forgot', async (req, res) => {
     throw err;
   }
   const link = `${config.appUrl}/reset-password?token=${token}`;
-  await sendEmail(me.email, 'Reset your SkillPass password', `Hello ${me.name},\n\nSomeone asked to reset the password for your SkillPass account. To choose a new password, open:\n${link}\n\nThe link works once and expires in ${RESET_LINK_MINUTES} minutes. If this was not you, ignore this email; your password stays the same.\n`);
+  try {
+    await sendEmail(me.email, 'Reset your SkillPass password', `Hello ${me.name},\n\nSomeone asked to reset the password for your SkillPass account. To choose a new password, open:\n${link}\n\nThe link works once and expires in ${RESET_LINK_MINUTES} minutes. If this was not you, ignore this email; your password stays the same.\n`);
+  } catch (err) {
+    // An error here would only ever happen for real accounts, so returning it would tell anyone which emails
+    // have an account. Log it for the administrator and give the same answer as for an unknown email.
+    if (!(err instanceof DeliveryError)) throw err;
+    console.error(`Password reset email for user ${me.id} was not delivered: ${err.message}`);
+    await logAudit(pool, { actor: { id: me.id, name: me.name }, action: 'email.delivery_failed', target: me.id, detail: 'Password reset email could not be delivered by the email provider' });
+    return res.json(answer);
+  }
   res.json({ ...answer, ...(showEmailLink() ? { devLink: link } : {}) });
 });
 

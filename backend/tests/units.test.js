@@ -114,6 +114,104 @@ describe('JobMatcher: ranking apprentices for a job', () => {
   });
 });
 
+describe('JobMatcher: invalid configuration is refused', () => {
+  it('refuses a negative weight even when the two weights add up to 1 (-0.2 and 1.2 used to score 110)', () => {
+    assert.throws(() => new JobMatcher({ skillWeight: -0.2, distanceWeight: 1.2 }), /skillWeight must be between 0 and 1/);
+    assert.throws(() => new JobMatcher({ skillWeight: 1.2, distanceWeight: -0.2 }), /skillWeight must be between 0 and 1/);
+    assert.throws(() => new JobMatcher({ skillWeight: 1.5, distanceWeight: -0.5 }), RangeError);
+  });
+
+  it('refuses each weight just outside 0 to 1', () => {
+    for (const [skillWeight, distanceWeight] of [[-1e-6, 1 + 1e-6], [1 + 1e-6, -1e-6], [-0.5, 0.5], [0.5, 1.5]]) {
+      assert.throws(() => new JobMatcher({ skillWeight, distanceWeight }), RangeError, `${skillWeight}, ${distanceWeight}`);
+    }
+  });
+
+  it('refuses weights that are not finite numbers', () => {
+    for (const bad of [NaN, Infinity, -Infinity, '0.7', null, true]) {
+      assert.throws(() => new JobMatcher({ skillWeight: bad, distanceWeight: 0.3 }), TypeError, String(bad));
+      assert.throws(() => new JobMatcher({ skillWeight: 0.7, distanceWeight: bad }), TypeError, String(bad));
+    }
+  });
+
+  it('refuses a maxKm that is zero, negative or not a finite number', () => {
+    for (const bad of [0, -5]) assert.throws(() => new JobMatcher({ maxKm: bad }), RangeError, String(bad));
+    for (const bad of [NaN, Infinity, '30']) assert.throws(() => new JobMatcher({ maxKm: bad }), TypeError, String(bad));
+  });
+
+  it('accepts the boundaries 0 and 1, and weights that only add to 1 after rounding', () => {
+    const ajah = { lat: 6.4698, lng: 3.5852 };
+    const job = { skillIds: ['s1'], location: ajah };
+    const here = { id: 'a', location: ajah, verified: new Set(['s1']) };
+    assert.equal(new JobMatcher({ skillWeight: 1, distanceWeight: 0 }).score(job, here).score, 100);
+    assert.equal(new JobMatcher({ skillWeight: 0, distanceWeight: 1 }).score(job, here).score, 100);
+    assert.doesNotThrow(() => new JobMatcher({ skillWeight: 0.1 + 0.2, distanceWeight: 0.7 })); // 0.30000000000000004
+  });
+
+  it('cannot be changed into an invalid state after it is built', () => {
+    const m = new JobMatcher();
+    assert.throws(() => { m.skillWeight = 1.2; }, TypeError);
+    assert.equal(m.skillWeight, 0.7);
+  });
+
+  it('always gives a whole number from 0 to 100, for 2,000 random valid settings and apprentices', () => {
+    let seed = 20261117; // fixed seed, so a failure can be replayed exactly
+    const rand = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+    const skills = ['s1', 's2', 's3', 's4', 's5'];
+    for (let i = 0; i < 2000; i += 1) {
+      const skillWeight = rand();
+      const m = new JobMatcher({ skillWeight, distanceWeight: 1 - skillWeight, maxKm: 1 + rand() * 100 });
+      const job = { skillIds: skills.slice(0, 1 + Math.floor(rand() * 5)), location: { lat: 6 + rand(), lng: 3 + rand() } };
+      const apprentice = { id: `a${i}`, location: { lat: 6 + rand(), lng: 3 + rand() }, verified: new Set(skills.filter(() => rand() < 0.5)) };
+      const { score } = m.score(job, apprentice);
+      assert.ok(Number.isInteger(score) && score >= 0 && score <= 100, `case ${i}: score ${score}`);
+    }
+  });
+});
+
+describe('JobMatcher: matching quality on realistic Lagos jobs', () => {
+  // A four-skill electrical job in Ajah, and artisans across Lagos. Distances from Ajah are measured, not made up:
+  // Sangotedo 5.4 km, Agungi 8.9 km, Lekki Phase 1 12.7 km, Yaba 24.1 km, Ikeja 29.7 km, Epe 45.8 km, Badagry 77.2 km.
+  const place = {
+    ajah: { lat: 6.4698, lng: 3.5852 }, sangotedo: { lat: 6.4690, lng: 3.6340 }, agungi: { lat: 6.4389, lng: 3.5105 },
+    lekki: { lat: 6.4474, lng: 3.4723 }, yaba: { lat: 6.5095, lng: 3.3711 }, ikeja: { lat: 6.6018, lng: 3.3515 },
+    epe: { lat: 6.5841, lng: 3.9834 }, badagry: { lat: 6.4316, lng: 2.8876 },
+  };
+  const job = { skillIds: ['wiring', 'db-board', 'earthing', 'fault-finding'], location: place.ajah };
+  const artisan = (id, where, skills) => ({ id, location: place[where], verified: new Set(skills) });
+  const all = job.skillIds;
+
+  it('puts a fully qualified artisan across town above a half-qualified one next door', () => {
+    const ranked = new JobMatcher().rank(job, [artisan('next-door-half', 'ajah', all.slice(0, 2)), artisan('yaba-full', 'yaba', all)]);
+    assert.deepEqual(ranked.map((m) => [m.id, m.score]), [['yaba-full', 76], ['next-door-half', 65]]);
+  });
+
+  it('prefers the nearer artisan when two hold the same skills', () => {
+    const ranked = new JobMatcher().rank(job, [artisan('lekki', 'lekki', all.slice(0, 3)), artisan('agungi', 'agungi', all.slice(0, 3))]);
+    assert.deepEqual(ranked.map((m) => [m.id, m.score]), [['agungi', 74], ['lekki', 70]]);
+  });
+
+  it('breaks equal scores by more skills held, then by distance, whatever order the list arrives in', () => {
+    // All four score 70: Lekki holds 3 skills nearby, the others hold all 4 but are at or past the 30 km limit.
+    const people = [artisan('lekki-3', 'lekki', all.slice(0, 3)), artisan('badagry-4', 'badagry', all), artisan('ikeja-4', 'ikeja', all), artisan('epe-4', 'epe', all)];
+    const expected = ['ikeja-4', 'epe-4', 'badagry-4', 'lekki-3'];
+    for (const order of [people, [...people].reverse(), [people[2], people[0], people[3], people[1]]]) {
+      const ranked = new JobMatcher().rank(job, order);
+      assert.ok(ranked.every((m) => m.score === 70));
+      assert.deepEqual(ranked.map((m) => m.id), expected);
+    }
+  });
+
+  it('leaves out an artisan with no verified required skill, however close they are', () => {
+    const ranked = new JobMatcher().rank(job, [artisan('same-street-unverified', 'ajah', []), artisan('other-trade', 'ajah', ['hemming']), artisan('sangotedo', 'sangotedo', ['wiring'])]);
+    assert.deepEqual(ranked.map((m) => m.id), ['sangotedo']);
+  });
+
+  it('returns nobody for a job that lists no skills, instead of ranking everyone at 0 skill match', () => {
+    assert.deepEqual(new JobMatcher().rank({ skillIds: [], location: place.ajah }, [artisan('a', 'ajah', all)]), []);
+  });
+});
+
 /* ------------------------------------------------------------------ trust score */
 
 describe('TrustScoreCalculator', () => {
